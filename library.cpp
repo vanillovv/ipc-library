@@ -7,7 +7,7 @@
 static std::map<int, HANDLE> pipes;
 static int g_index = 0;
 
-JNIEXPORT jint JNICALL Java_com_ferra13671_discordipc_Native_create(JNIEnv* env, jobject, jstring name) {
+JNIEXPORT jint JNICALL Java_ru_vanilla_ipc_Native_create(JNIEnv* env, jobject, jstring name) {
     const char *cstr = env->GetStringUTFChars(name, NULL);
     env->ReleaseStringUTFChars(name, cstr);
 
@@ -28,7 +28,7 @@ JNIEXPORT jint JNICALL Java_com_ferra13671_discordipc_Native_create(JNIEnv* env,
     return index;
 }
 
-JNIEXPORT void JNICALL Java_com_ferra13671_discordipc_Native_write(JNIEnv* env, jobject, jint index, jbyteArray bytes) {
+JNIEXPORT void JNICALL Java_ru_vanilla_ipc_Native_write(JNIEnv* env, jobject, jint index, jbyteArray bytes) {
     auto it = pipes.find(index);
     if (it == pipes.end()) return;
 
@@ -45,7 +45,7 @@ JNIEXPORT void JNICALL Java_com_ferra13671_discordipc_Native_write(JNIEnv* env, 
     env->ReleaseByteArrayElements(bytes, data, 0);
 }
 
-JNIEXPORT jbyteArray JNICALL Java_com_ferra13671_discordipc_Native_read(JNIEnv* env, jobject, jint index, jint size, jint offset) {
+JNIEXPORT jbyteArray JNICALL Java_ru_vanilla_ipc_Native_read(JNIEnv* env, jobject, jint index, jint size, jint offset) {
     auto it = pipes.find(index);
 
     if (it == pipes.end() || size <= 0) {
@@ -73,7 +73,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_ferra13671_discordipc_Native_read(JNIEnv* 
     return result;
 }
 
-JNIEXPORT void JNICALL Java_com_ferra13671_discordipc_Native_close(JNIEnv*, jobject, jint index){
+JNIEXPORT void JNICALL Java_ru_vanilla_ipc_Native_close(JNIEnv*, jobject, jint index){
     auto it = pipes.find(index);
     if (it == pipes.end()) return;
 
