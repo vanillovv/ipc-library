@@ -8,11 +8,12 @@ static std::map<int, HANDLE> pipes;
 static int g_index = 0;
 
 JNIEXPORT jint JNICALL Java_ru_vanilla_ipc_Native_create(JNIEnv* env, jobject, jstring name) {
+    if (!name) return -1;
+
     const char *cstr = env->GetStringUTFChars(name, NULL);
-    env->ReleaseStringUTFChars(name, cstr);
 
     HANDLE pipe = CreateFile(
-        TEXT(cstr),
+        cstr,
         GENERIC_READ,
         0,
         NULL,
@@ -20,6 +21,10 @@ JNIEXPORT jint JNICALL Java_ru_vanilla_ipc_Native_create(JNIEnv* env, jobject, j
         0,
         NULL
     );
+
+    env->ReleaseStringUTFChars(name, cstr);
+
+    if (pipe == INVALID_HANDLE_VALUE) return -1;
 
     int index = g_index++;
 
@@ -57,7 +62,7 @@ JNIEXPORT jbyteArray JNICALL Java_ru_vanilla_ipc_Native_read(JNIEnv* env, jobjec
     std::vector<jbyte> vector(size);
 
     DWORD dword = 0;
-    BOOL read = ReadFile(pipe,vector.data(), size, &dword, NULL);
+    BOOL read = ReadFile(pipe, vector.data(), size, &dword, NULL);
 
     if (!read) return env->NewByteArray((0));
 
@@ -66,14 +71,14 @@ JNIEXPORT jbyteArray JNICALL Java_ru_vanilla_ipc_Native_read(JNIEnv* env, jobjec
     }
 
     jint g_size = dword - offset;
-    jbyteArray result = env->NewByteArray(g_size);
+    jbyteArray byteArray = env->NewByteArray(g_size);
 
-    env->SetByteArrayRegion(result, 0, g_size, vector.data() + offset);
+    env->SetByteArrayRegion(byteArray, 0, g_size, vector.data() + offset);
 
-    return result;
+    return byteArray;
 }
 
-JNIEXPORT void JNICALL Java_ru_vanilla_ipc_Native_close(JNIEnv*, jobject, jint index){
+JNIEXPORT void JNICALL Java_ru_vanilla_ipc_Native_close(JNIEnv*, jobject, jint index) {
     auto it = pipes.find(index);
     if (it == pipes.end()) return;
 

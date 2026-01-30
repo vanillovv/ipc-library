@@ -8,3 +8,11 @@ add_library(ipc_library SHARED library.cpp)
 target_include_directories(ipc_library PRIVATE /usr/x86_64-w64-mingw32/include)
 target_include_directories(ipc_library PRIVATE /usr/lib/jvm/java-25-temurin/include)
 target_include_directories(ipc_library PRIVATE /usr/lib/jvm/java-25-temurin/include/linux)
+
+if (MINGW)
+    target_link_options(ipc_library PRIVATE
+        -static-libgcc
+        -static-libstdc++
+        -static
+    )
+endif()
